@@ -1,7 +1,5 @@
 # 🏗️ CodeArch — Autonomous Codebase Archaeologist
 
-![CodeArch UI](screenshot.png)
-
 > Drop a GitHub URL. Four AI agents collaborate autonomously to produce an elite onboarding intelligence report — **100% local, no API keys, no cloud.**
 
 <div align="center">
