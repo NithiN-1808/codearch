@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CodeArch — Codebase Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- Marked for markdown rendering -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a25;
+    --border: #252535;
+    --border2: #33334a;
+    --text: #e8e8f0;
+    --muted: #7070a0;
+    --accent: #7c6af7;
+    --accent2: #a89cf7;
+    --amber: #f7c66a;
+    --teal: #4dd9b0;
+    --coral: #f76a7c;
+    --green: #6af7a8;
+    --radius: 12px;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.65;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(124,106,247,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,106,247,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Header ── */
+  header {
+    padding: 56px 0 40px;
+    text-align: center;
+  }
+
+  .logo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(124,106,247,0.12);
+    border: 1px solid rgba(124,106,247,0.25);
+    border-radius: 100px;
+    padding: 6px 16px 6px 10px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent2);
+    margin-bottom: 24px;
+  }
+
+  .logo-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(124,106,247,0.4); }
+    50% { opacity: 0.85; box-shadow: 0 0 0 6px rgba(124,106,247,0); }
+  }
+
+  h1 {
+    font-family: var(--font-head);
+    font-size: clamp(36px, 6vw, 58px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    line-height: 1.05;
+    margin-bottom: 16px;
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, var(--accent2) 0%, var(--teal) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 16px;
+    font-weight: 300;
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  /* ── Input card ── */
+  .input-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 32px;
+  }
+
+  .input-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .repo-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 13px 16px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .repo-input:focus { border-color: var(--accent); }
+  .repo-input::placeholder { color: var(--muted); }
+
+  .analyse-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius);
+    padding: 13px 24px;
+    font-family: var(--font-head);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+  }
+
+  .analyse-btn:hover { background: var(--accent2); transform: translateY(-1px); }
+  .analyse-btn:active { transform: translateY(0); }
+  .analyse-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .examples {
+    margin-top: 14px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .examples-label {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+  }
+
+  .example-chip {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .example-chip:hover {
+    border-color: var(--accent);
+    color: var(--accent2);
+    background: rgba(124,106,247,0.08);
+  }
+
+  /* ── Agent pipeline ── */
+  .pipeline {
+    display: none;
+    margin-bottom: 32px;
+  }
+
+  .pipeline.visible { display: block; }
+
+  .pipeline-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .agents-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 600px) {
+    .agents-row { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .agent-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 12px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .agent-card.active {
+    border-color: var(--accent);
+    background: rgba(124,106,247,0.08);
+  }
+
+  .agent-card.done {
+    border-color: var(--teal);
+    background: rgba(77,217,176,0.07);
+  }
+
+  .agent-icon {
+    font-size: 22px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .agent-name {
+    font-family: var(--font-head);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+
+  .agent-role {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+  }
+
+  /* ── Progress log ── */
+  .progress-log {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.8;
+    min-height: 80px;
+    color: var(--muted);
+    max-height: 180px;
+    overflow-y: auto;
+  }
+
+  .log-line { color: var(--text); }
+  .log-line.ok { color: var(--teal); }
+  .log-line.err { color: var(--coral); }
+
+  .spinner {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border: 2px solid var(--border2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Report ── */
+  .report-section {
+    display: none;
+  }
+
+  .report-section.visible { display: block; }
+
+  .report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .report-title {
+    font-family: var(--font-head);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .copy-btn {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent2); }
+
+  .report-body {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px 40px;
+    line-height: 1.75;
+  }
+
+  @media (max-width: 600px) {
+    .report-body { padding: 24px 20px; }
+  }
+
+  /* Markdown styles */
+  .report-body h1 {
+    font-family: var(--font-head);
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin: 0 0 24px;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 16px;
+  }
+
+  .report-body h2 {
+    font-family: var(--font-head);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent2);
+    margin: 32px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .report-body h3 {
+    font-family: var(--font-head);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 20px 0 8px;
+  }
+
+  .report-body p { margin: 0 0 14px; color: var(--text); }
+
+  .report-body ul, .report-body ol {
+    margin: 0 0 14px 20px;
+    color: var(--text);
+  }
+
+  .report-body li { margin-bottom: 5px; }
+
+  .report-body code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: rgba(124,106,247,0.12);
+    border: 1px solid rgba(124,106,247,0.2);
+    border-radius: 5px;
+    padding: 1px 6px;
+    color: var(--accent2);
+  }
+
+  .report-body pre {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    overflow-x: auto;
+    margin: 16px 0;
+  }
+
+  .report-body pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text);
+    font-size: 13px;
+  }
+
+  .report-body strong { color: var(--text); font-weight: 600; }
+  .report-body em { color: var(--amber); font-style: italic; }
+
+  .report-body blockquote {
+    border-left: 3px solid var(--accent);
+    padding: 12px 20px;
+    margin: 16px 0;
+    background: rgba(124,106,247,0.06);
+    border-radius: 0 8px 8px 0;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* ── How it works ── */
+  .how-it-works {
+    margin: 48px 0;
+    text-align: center;
+  }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    text-align: left;
+  }
+
+  .step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+
+  .step-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .step-title {
+    font-family: var(--font-head);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .step-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border);
+    margin-top: 64px;
+    padding: 28px 0;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  footer span { color: var(--accent2); }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-badge">
+      <span class="logo-dot"></span>
+      LangGraph · Ollama · 100% Local
+    </div>
+    <h1><span class="gradient-text">CodeArch</span></h1>
+    <p class="subtitle">Autonomous multi-agent codebase archaeologist. Drop any GitHub repo, get an elite onboarding report — no cloud, no API keys.</p>
+  </header>
+
+  <!-- Input -->
+  <div class="input-card">
+    <label class="input-label">GitHub repository URL</label>
+    <div class="input-row">
+      <input
+        type="text"
+        class="repo-input"
+        id="repo-input"
+        placeholder="https://github.com/owner/repo"
+        value=""
+      />
+      <button class="analyse-btn" id="analyse-btn" onclick="startAnalysis()">
+        Analyse →
+      </button>
+    </div>
+    <div class="examples">
+      <span class="examples-label">Try:</span>
+      <button class="example-chip" onclick="setExample('https://github.com/tiangolo/fastapi')">fastapi</button>
+      <button class="example-chip" onclick="setExample('https://github.com/pallets/flask')">flask</button>
+      <button class="example-chip" onclick="setExample('https://github.com/expressjs/express')">express</button>
+      <button class="example-chip" onclick="setExample('https://github.com/django/django')">django</button>
+    </div>
+  </div>
+
+  <!-- Agent pipeline (shown during analysis) -->
+  <div class="pipeline" id="pipeline">
+    <div class="pipeline-title">Agent pipeline — running locally on Ollama</div>
+    <div class="agents-row">
+      <div class="agent-card" id="agent-cloner">
+        <span class="agent-icon">⏬</span>
+        <div class="agent-name">Cloner</div>
+        <div class="agent-role">git clone</div>
+      </div>
+      <div class="agent-card" id="agent-explorer">
+        <span class="agent-icon">🔭</span>
+        <div class="agent-name">Explorer</div>
+        <div class="agent-role">maps structure</div>
+      </div>
+      <div class="agent-card" id="agent-analyst">
+        <span class="agent-icon">🔬</span>
+        <div class="agent-name">Analyst</div>
+        <div class="agent-role">finds patterns</div>
+      </div>
+      <div class="agent-card" id="agent-skeptic">
+        <span class="agent-icon">🤔</span>
+        <div class="agent-name">Skeptic</div>
+        <div class="agent-role">challenges</div>
+      </div>
+    </div>
+    <div class="progress-log" id="progress-log">
+      <span class="spinner"></span> Initialising...
+    </div>
+  </div>
+
+  <!-- Report -->
+  <div class="report-section" id="report-section">
+    <div class="report-header">
+      <div class="report-title">📋 Intelligence Report</div>
+      <button class="copy-btn" onclick="copyReport()">Copy markdown</button>
+    </div>
+    <div class="report-body" id="report-body"></div>
+  </div>
+
+  <!-- How it works -->
+  <div class="how-it-works" id="how-section">
+    <div class="section-label">How it works</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01 · Cloner</div>
+        <div class="step-title">Clone & scan</div>
+        <div class="step-desc">Shallow git clone, walks the file tree, reads up to 40 key files.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02 · Explorer</div>
+        <div class="step-title">Map structure</div>
+        <div class="step-desc">LangGraph node uses llama3 to understand tech stack, entry points, and modules.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03 · Analyst</div>
+        <div class="step-title">Find patterns</div>
+        <div class="step-desc">deepseek-coder surfaces tech debt, hidden conventions, and onboarding traps.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">04 · Skeptic</div>
+        <div class="step-title">Challenge</div>
+        <div class="step-desc">Asks probing questions, identifies gaps in previous analysis.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">05 · Writer</div>
+        <div class="step-title">Generate report</div>
+        <div class="step-desc">Synthesises all agents into an actionable day-1 onboarding guide.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    Built with <span>LangGraph</span> · <span>Ollama</span> · <span>FastAPI</span> · runs 100% locally · no API keys needed
+  </div>
+</footer>
+
+<script>
+const API_BASE = 'http://localhost:8000';
+let rawMarkdown = '';
+
+function setExample(url) {
+  document.getElementById('repo-input').value = url;
+}
+
+function addLog(msg, type = '') {
+  const log = document.getElementById('progress-log');
+  const line = document.createElement('div');
+  line.className = `log-line ${type}`;
+  line.textContent = msg;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+
+function setAgentActive(name) {
+  document.querySelectorAll('.agent-card').forEach(c => {
+    if (!c.classList.contains('done')) c.classList.remove('active');
+  });
+  const card = document.getElementById(`agent-${name}`);
+  if (card) card.classList.add('active');
+}
+
+function setAgentDone(name) {
+  const card = document.getElementById(`agent-${name}`);
+  if (card) { card.classList.remove('active'); card.classList.add('done'); }
+}
+
+async function startAnalysis() {
+  const url = document.getElementById('repo-input').value.trim();
+  if (!url) return;
+
+  // Reset UI
+  rawMarkdown = '';
+  document.getElementById('report-section').classList.remove('visible');
+  document.getElementById('report-body').innerHTML = '';
+  document.getElementById('progress-log').innerHTML = '<span class="spinner"></span> Connecting to CodeArch API...';
+  document.querySelectorAll('.agent-card').forEach(c => {
+    c.classList.remove('active','done');
+  });
+  document.getElementById('pipeline').classList.add('visible');
+  document.getElementById('how-section').style.display = 'none';
+  document.getElementById('analyse-btn').disabled = true;
+  document.getElementById('analyse-btn').textContent = 'Analysing...';
+
+  setAgentActive('cloner');
+
+  try {
+    const response = await fetch(`${API_BASE}/analyse/stream`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ repo_url: url, use_local: false })
+    });
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const event = JSON.parse(line.slice(6));
+          handleEvent(event);
+        } catch {}
+      }
+    }
+  } catch (err) {
+    addLog(`❌ Error: ${err.message}. Is the backend running? (python server.py)`, 'err');
+  } finally {
+    document.getElementById('analyse-btn').disabled = false;
+    document.getElementById('analyse-btn').textContent = 'Analyse →';
+  }
+}
+
+function handleEvent(event) {
+  const { type, data } = event;
+
+  if (type === 'progress') {
+    addLog(data, data.startsWith('✅') ? 'ok' : '');
+
+    // Update agent cards
+    if (data.includes('Cloning') || data.includes('cloning')) setAgentActive('cloner');
+    else if (data.includes('Scanning') || data.includes('Found')) {
+      setAgentDone('cloner');
+      setAgentActive('explorer');
+    }
+    else if (data.includes('Explorer')) { setAgentDone('cloner'); setAgentActive('explorer'); }
+    else if (data.includes('Analyst'))  { setAgentDone('explorer'); setAgentActive('analyst'); }
+    else if (data.includes('Skeptic'))  { setAgentDone('analyst'); setAgentActive('skeptic'); }
+    else if (data.includes('Writer'))   { setAgentDone('skeptic'); }
+  }
+
+  if (type === 'result') {
+    rawMarkdown = data;
+    document.getElementById('report-section').classList.add('visible');
+    document.getElementById('report-body').innerHTML = marked.parse(data);
+    document.getElementById('report-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    ['cloner','explorer','analyst','skeptic'].forEach(setAgentDone);
+  }
+
+  if (type === 'error') {
+    addLog(`❌ ${data}`, 'err');
+  }
+
+  if (type === 'done') {
+    addLog('🎉 Report ready!', 'ok');
+  }
+}
+
+function copyReport() {
+  navigator.clipboard.writeText(rawMarkdown).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = 'Copy markdown', 2000);
+  });
+}
+
+// Allow Enter key
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('repo-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') startAnalysis();
+  });
+});
+</script>
+</body>
+</html>
